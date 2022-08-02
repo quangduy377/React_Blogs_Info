@@ -28,4 +28,8 @@
     text-transform: capitalize;
     cursor: pointer;
   }
+  .tag.active{
+    background: rgb(77, 70, 70);
+    color: white;
+  }
 }

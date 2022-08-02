@@ -3,7 +3,7 @@ import "../css/blogs.scss";
 import PropTypes from "prop-types";
 import React from "react";
 
-function BlogPost({ author, title, excerpt }) {
+function BlogPost({ author, title, excerpt, tags }) {
   return (
     <li className="blogsWrapper">
       <div className="blog">
@@ -13,7 +13,8 @@ function BlogPost({ author, title, excerpt }) {
             src={`https://joeschmoe.io/api/v1/${author}`}
             alt="Author"
           />
-          <p variant="body">{author}</p>
+          <p variant="body">{author}______{tags}</p>
+          
         </div>
 
         <h2>{title}</h2>

@@ -7,10 +7,21 @@ import { useEffect } from "react";
 
 const PAGE_SIZES = [15, 25, 50, 100];
 
-function BlogList() {
+const containTags = (filteredTags, existedTags) => {
+  //existedTags must contain or equal to filteredTags
+  for (let i = 0; i < filteredTags.length; i++) {
+    if (!existedTags.includes(filteredTags[i])) {
+      return false
+    }
+  }
+  return true
+}
+
+function BlogList({ tags }) {
   const [curPageSize, setCurPageSize] = useState(PAGE_SIZES[0]) //default rows per page is 15
   const [currentPage, setCurPage] = useState(1) //default current page is 1  
-  const currentPaginationData = blogs.posts.slice((currentPage-1)*curPageSize, curPageSize * currentPage);
+  const currentPaginationData = blogs.posts.slice((currentPage - 1) * curPageSize, curPageSize * currentPage);
+  // const [filteredPost, setFilteredPost] = useState(currentPaginationData)
   const updateRowsPerPage = (rows) => {
     setCurPageSize(+rows)
     setCurPage(1)
@@ -18,12 +29,30 @@ function BlogList() {
   const updatePage = (curPage) => {
     setCurPage(curPage)
   };
+  let filteredPost = []
+  if (tags.length !== 0) {
+    for (let i = 0; i < currentPaginationData.length; i++) {
+      if (containTags(tags, currentPaginationData[i].tags)) {
+        filteredPost.push(currentPaginationData[i])
+      }
+    }
+  }
+  else{
+    console.log('JUMPED IN ELSE')
+    filteredPost = currentPaginationData
+  }
+  console.log('tag = ',tags)
+  console.log('filteredPost = ',filteredPost)
+
+
+
+
   return (
     <div>
       <Pagination
-        currentPage={currentPage} 
+        currentPage={currentPage}
         totalCount={blogs.posts.length}
-        pageSize={curPageSize} 
+        pageSize={curPageSize}
         pageSizeOptions={PAGE_SIZES}
         onPageChange={updatePage}
         onPageSizeOptionChange={updateRowsPerPage}
@@ -32,13 +61,14 @@ function BlogList() {
         // Do not remove the aria-label below, it is used for Hatchways automation.
         aria-label="blog list"
       >
-        {currentPaginationData.map((blog) => (
+        {filteredPost.map((blog) => (
           <BlogPost
             key={blog.id}
             author={blog.author}
             title={blog.title}
             excerpt={blog.excerpt}
             featureImage={blog.image}
+            tags = {blog.tags.toString()}
           />
         ))}
       </ul>
