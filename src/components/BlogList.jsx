@@ -4,6 +4,8 @@ import React from "react";
 import blogs from "../data/blogs.json";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useContext } from "react";
+import { SearchContext } from "../context/search-context";
 
 const PAGE_SIZES = [15, 25, 50, 100];
 
@@ -17,11 +19,28 @@ const containTags = (filteredTags, existedTags) => {
   return true
 }
 
-function BlogList({ tags }) {
+function BlogList() {
+  const searchCtx = useContext(SearchContext)
+  const tags = searchCtx.tags
+  
   const [curPageSize, setCurPageSize] = useState(PAGE_SIZES[0]) //default rows per page is 15
   const [currentPage, setCurPage] = useState(1) //default current page is 1  
-  const currentPaginationData = blogs.posts.slice((currentPage - 1) * curPageSize, curPageSize * currentPage);
-  // const [filteredPost, setFilteredPost] = useState(currentPaginationData)
+  let filteredPost = []
+  if (tags.length !== 0) {
+    for (let i = 0; i < blogs.posts.length; i++) {
+      if (containTags(tags, blogs.posts[i].tags)) {
+        filteredPost.push(blogs.posts[i])
+      }
+    }
+  }
+  else{
+    filteredPost = blogs.posts
+  }
+  const currentPaginationData = filteredPost.slice((currentPage - 1) * curPageSize, curPageSize * currentPage);
+  useEffect(()=>{
+    //reset to the first page if filtered tags changed
+    setCurPage(1)
+  },[tags])
   const updateRowsPerPage = (rows) => {
     setCurPageSize(+rows)
     setCurPage(1)
@@ -29,29 +48,11 @@ function BlogList({ tags }) {
   const updatePage = (curPage) => {
     setCurPage(curPage)
   };
-  let filteredPost = []
-  if (tags.length !== 0) {
-    for (let i = 0; i < currentPaginationData.length; i++) {
-      if (containTags(tags, currentPaginationData[i].tags)) {
-        filteredPost.push(currentPaginationData[i])
-      }
-    }
-  }
-  else{
-    console.log('JUMPED IN ELSE')
-    filteredPost = currentPaginationData
-  }
-  console.log('tag = ',tags)
-  console.log('filteredPost = ',filteredPost)
-
-
-
-
   return (
     <div>
       <Pagination
         currentPage={currentPage}
-        totalCount={blogs.posts.length}
+        totalCount={filteredPost.length} //blogs.posts.length
         pageSize={curPageSize}
         pageSizeOptions={PAGE_SIZES}
         onPageChange={updatePage}
@@ -61,7 +62,7 @@ function BlogList({ tags }) {
         // Do not remove the aria-label below, it is used for Hatchways automation.
         aria-label="blog list"
       >
-        {filteredPost.map((blog) => (
+        {currentPaginationData.map((blog) => (
           <BlogPost
             key={blog.id}
             author={blog.author}

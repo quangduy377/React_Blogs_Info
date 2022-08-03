@@ -3,7 +3,8 @@ import blogs from "../data/blogs.json";
 import "../css/sidebar.scss";
 import { useState } from "react";
 import { useEffect } from "react";
-
+import { useContext } from "react";
+import { SearchContext } from "../context/search-context";
 const exampleFooter = [
   "Help",
   "Status",
@@ -18,16 +19,18 @@ const tagArr = blogs.tags.map(tag=>{
     return {name:tag,activate:false}
   } 
 )
-function StickySidebar({onFilterTags}) {
-  const [tagsState, setTagStates] = useState(tagArr)
-  // console.log(tagsState)
+function StickySidebar() {
+  const searchCtx = useContext(SearchContext)
+  const tagsState = searchCtx.tags
+  // const [tagsState, setTagStates] = useState(tagArr)
 
   const onChangeTagState = (tagName) =>{
-    console.log('chnage state')
     const newTagsState = [...tagsState]
     const index = newTagsState.findIndex(tag=>tag.name===tagName)
     newTagsState[index].activate = !newTagsState[index].activate
-    setTagStates(newTagsState)
+    searchCtx.updateTags(newTagsState)
+
+    // setTagStates(newTagsState)
   }
 
   useEffect(()=>{
