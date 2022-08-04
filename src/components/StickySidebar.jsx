@@ -21,34 +21,38 @@ const tagArr = blogs.tags.map(tag=>{
 )
 function StickySidebar() {
   const searchCtx = useContext(SearchContext)
-  const tagsState = searchCtx.tags
+  const tags = searchCtx.tags
   // const [tagsState, setTagStates] = useState(tagArr)
-
   const onChangeTagState = (tagName) =>{
-    const newTagsState = [...tagsState]
-    const index = newTagsState.findIndex(tag=>tag.name===tagName)
-    newTagsState[index].activate = !newTagsState[index].activate
-    searchCtx.updateTags(newTagsState)
-
+    const newTags = [...tags]
+    const index = newTags.findIndex(tag=>tag===tagName)
+    console.log('index = ',index)
+    if(index>=0){
+      newTags.splice(index,1)
+    }
+    else{
+      newTags.push(tagName)
+    }
+    searchCtx.updateTags(newTags)
     // setTagStates(newTagsState)
   }
 
-  useEffect(()=>{
-    // console.log('USEEFFECT: ',tagsState)
-    const filteredTags = tagsState.filter(tagState=>tagState.activate===true)
-    // console.log('filteredTags: ',filteredTags)
-    const tags = filteredTags.map(tag=>tag.name)
-    // console.log('tags: ',tags)
-    onFilterTags(tags)
-  },[tagsState])
+  // useEffect(()=>{
+  //   // console.log('USEEFFECT: ',tagsState)
+  //   const filteredTags = tagsState.filter(tagState=>tagState.activate===true)
+  //   // console.log('filteredTags: ',filteredTags)
+  //   const tags = filteredTags.map(tag=>tag.name)
+  //   // console.log('tags: ',tags)
+  //   onFilterTags(tags)
+  // },[tags])
 
   return (
     <div className="sidebar">
       <p>discover more of what matters to you</p>
       <div className="tagWrapper">
-        {tagsState.map((tag) => (
-          <div className={`tag ${tag.activate?'active':''}`} key={tag.name} onClick={onChangeTagState.bind(null,tag.name)}>
-            {tag.name}
+        {blogs.tags.map((tag) => (
+          <div className={`tag ${tags.includes(tag)?'active':''}`} key={tag} onClick={onChangeTagState.bind(null,tag)}>
+            {tag}
           </div>
         ))}
       </div>

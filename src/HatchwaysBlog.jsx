@@ -7,18 +7,53 @@ import StickySidebar from "./components/StickySidebar";
 import { SearchContext } from "./context/search-context";
 import blogs from "../src/data/blogs.json"
 function HatchwaysBlog() {
-  const [tagsState, setTagsState] = useState([])
+  const [tags, setTags] = useState([])
+  const [keyword, setKeyWord] = useState(null)
   const [postsList, setPostsList] = useState(blogs.posts)
-  // const onFilterTags = (filteredTags) =>{
-  //   setTags(filteredTags)
-  // }
-  // let postList=blogs.posts
-  const onUpdatePostList = (keyword) =>{
-    let postList = [] 
-    for(const post of blogs.posts){
-      for(const key in post){
-        if(key!=='id'){
-          if(key.includes(keyword)){
+
+  const isIncluded = (postTags, filteredTags) => {
+   
+    for(const tag of filteredTags){
+      if (!postTags.includes(tag)) {
+        return false
+      }
+    }
+    return true
+  }
+
+  const onUpdatePostList = (keyword, tags) => {
+    let postList = []
+    if (keyword == null) {
+      for (const post of blogs.posts) {
+        if (isIncluded(post['tags'], tags)) {
+          postList.push(post)
+        }
+      }
+    }
+    else if (tags == null) {
+      for (const post of blogs.posts) {
+        for (const key in post) {
+          if (key !== 'id' && key !== 'readingTimeMinutes' && key !== 'tags') {
+            // console.log(post[key])
+            if (post[key].includes(keyword)) {
+              postList.push(post)
+              break
+            }
+          }
+        }
+      }
+    }
+    else {
+      for (const post of blogs.posts) {
+        for (const key in post) {
+          //there are tags to filter out
+          if(!isIncluded(post['tags'], tags)){
+            break
+          }
+          if (key === 'id' || key === 'readingTimeMinutes') {
+            continue
+          }
+          if (post[key].includes(keyword)) {
             postList.push(post)
             break
           }
@@ -27,19 +62,31 @@ function HatchwaysBlog() {
     }
     setPostsList(postList)
   }
-  const onUpdateTags = (tagsState) =>{
-    setTagsState(tagsState)
+  const onUpdateTags = (tags) => {
+    setTags(tags)
+  }
+  const onUpdateKeyword = (keyword) =>{
+    setKeyWord(keyword)
   }
 
   return (
     <div style={{ margin: "0 auto", width: "100%", padding: 20 }}>
-      <SearchContext.Provider value={{tagsState: tagsState, postList: postsList, updateList: onUpdatePostList, updateTags: onUpdateTags }}>
+      <SearchContext.Provider value={
+        { 
+          tags: tags, 
+          keyword: keyword, 
+          postList: postsList, 
+          updateList: onUpdatePostList, 
+          updateTags: onUpdateTags,
+          updateKeyword: onUpdateKeyword
+        }
+        }>
         <StyledNavbar />
         <div style={{ marginTop: 60, display: "flex" }}>
-          <BlogList 
-            //tags =  {tags}
+          <BlogList
+          //tags =  {tags}
           />
-          <StickySidebar/>
+          <StickySidebar />
         </div>
       </SearchContext.Provider>
     </div>

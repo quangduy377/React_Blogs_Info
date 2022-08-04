@@ -1,8 +1,10 @@
 import { useContext } from "react";
 import { createContext } from "react";
 export const SearchContext = createContext({
-    tagsState: [],
+    tags: [],
+    keyword: '',
     postList: [], 
-    updateList : (keyword) =>{},
-    updateTags: (tags) =>{}
+    updateList : (keyword,tags) =>{},
+    updateTags: (tags) =>{},
+    updateKeyword: (keyword) =>{}
 })

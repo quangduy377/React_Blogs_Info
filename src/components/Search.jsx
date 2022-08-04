@@ -8,7 +8,12 @@ function SearchInput() {
   return (
     <div style={{ display: "flex" }}>
       <SearchIcon className="icon" />
-      <input className="input" placeholder="Search..." onChange={(event)=>{searchCtx.updateList(event.target.value)}}/>
+      <input className="input" placeholder="Search..." onChange={(event)=>
+        {
+          searchCtx.updateList(event.target.value, null)
+          searchCtx.updateKeyword(event.target.value)
+        }
+        }/>
     </div>
   );
 }

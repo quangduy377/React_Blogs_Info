@@ -22,25 +22,18 @@ const containTags = (filteredTags, existedTags) => {
 function BlogList() {
   const searchCtx = useContext(SearchContext)
   const tags = searchCtx.tags
-  
+  const keyword = searchCtx.keyword
+  const postList = searchCtx.postList
+
   const [curPageSize, setCurPageSize] = useState(PAGE_SIZES[0]) //default rows per page is 15
   const [currentPage, setCurPage] = useState(1) //default current page is 1  
-  let filteredPost = []
-  if (tags.length !== 0) {
-    for (let i = 0; i < blogs.posts.length; i++) {
-      if (containTags(tags, blogs.posts[i].tags)) {
-        filteredPost.push(blogs.posts[i])
-      }
-    }
-  }
-  else{
-    filteredPost = blogs.posts
-  }
-  const currentPaginationData = filteredPost.slice((currentPage - 1) * curPageSize, curPageSize * currentPage);
-  useEffect(()=>{
+  
+  const currentPaginationData = postList.slice((currentPage - 1) * curPageSize, curPageSize * currentPage);
+  useEffect(() => {
     //reset to the first page if filtered tags changed
     setCurPage(1)
-  },[tags])
+    searchCtx.updateList(keyword,tags)
+  }, [tags,keyword])
   const updateRowsPerPage = (rows) => {
     setCurPageSize(+rows)
     setCurPage(1)
@@ -52,7 +45,7 @@ function BlogList() {
     <div>
       <Pagination
         currentPage={currentPage}
-        totalCount={filteredPost.length} //blogs.posts.length
+        totalCount={postList.length}
         pageSize={curPageSize}
         pageSizeOptions={PAGE_SIZES}
         onPageChange={updatePage}
@@ -69,7 +62,7 @@ function BlogList() {
             title={blog.title}
             excerpt={blog.excerpt}
             featureImage={blog.image}
-            tags = {blog.tags.toString()}
+            tags={blog.tags.toString()}
           />
         ))}
       </ul>
